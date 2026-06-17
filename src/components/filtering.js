@@ -13,7 +13,7 @@ export function initFiltering(elements, indexes) {
     }
 }*/
 
-import {createComparison, defaultRules} from "../lib/compare.js";
+/*import {createComparison, defaultRules} from "../lib/compare.js";
 
 const compare = createComparison(defaultRules);
 
@@ -46,4 +46,43 @@ export function initFiltering(elements, indexes) {
 
         return data.filter(row => compare(row, state));
     }
+}*/
+
+import { createComparison, defaultRules } from "../lib/compare.js";
+
+const compare = createComparison(defaultRules);
+
+export function initFiltering(elements, indexes) {
+
+    Object.keys(indexes).forEach((name) => {
+        elements[name].append(
+            ...Object.values(indexes[name]).map(value => {
+                const option = document.createElement("option");
+                option.value = value;
+                option.textContent = value;
+                return option;
+            })
+        );
+    });
+
+    return (data, state, action) => {
+
+        // reset
+        if (action && action.name === "clear") {
+            const input = action.parentElement.querySelector("input");
+            if (input) input.value = "";
+
+            state[action.dataset.field] = "";
+        }
+
+        const normalizedState = {
+            ...state,
+            total: [
+                state.totalFrom,
+                state.totalTo
+            ]
+        };
+
+        return data.filter(row => compare(row, normalizedState));
+    };
 }
